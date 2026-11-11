@@ -258,7 +258,7 @@ export const FormulaBuilder: React.FC<FormulaBuilderProps> = ({
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
-          <span className="text-[11px] font-semibold text-slate-400">Active Matter</span>
+          <span className="text-[11px] font-semibold text-slate-400">Surfactant Active Matter</span>
           <div className="text-xl font-bold font-mono text-cyan-400">
             {activeMatter.totalActiveMatterPercent.toFixed(1)}%
           </div>
@@ -268,15 +268,15 @@ export const FormulaBuilder: React.FC<FormulaBuilderProps> = ({
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
           <span className="text-[11px] font-semibold text-slate-400">Material Cost</span>
           <div className="text-xl font-bold font-mono text-emerald-400">
-            ${costing.costPerKgUSD.toFixed(3)} <span className="text-xs text-slate-500">/ kg</span>
+            ₹{costing.costPerKgINR.toFixed(2)} <span className="text-xs text-slate-500">/ kg</span>
           </div>
-          <p className="text-[10px] text-slate-500">Batch total: ${costing.directMaterialCostUSD.toFixed(2)}</p>
+          <p className="text-[10px] text-slate-500">Batch total: ₹{costing.directMaterialCostINR.toFixed(2)}</p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
           <span className="text-[11px] font-semibold text-slate-400">Cost per Liter</span>
           <div className="text-xl font-bold font-mono text-slate-200">
-            ${costing.costPerLiterUSD.toFixed(3)} <span className="text-xs text-slate-500">/ L</span>
+            ₹{costing.costPerLiterINR.toFixed(2)} <span className="text-xs text-slate-500">/ L</span>
           </div>
           <p className="text-[10px] text-slate-500">Density estimated</p>
         </div>
@@ -324,8 +324,8 @@ export const FormulaBuilder: React.FC<FormulaBuilderProps> = ({
                 <th className="p-3 text-right">Weight %</th>
                 <th className="p-3 text-right">Active %</th>
                 <th className="p-3 text-right">Active Contribution</th>
-                <th className="p-3 text-right">Cost/kg ($)</th>
-                <th className="p-3 text-right">Item Total ($)</th>
+                <th className="p-3 text-right">Cost/kg (₹)</th>
+                <th className="p-3 text-right">Item Total (₹)</th>
                 <th className="p-3 text-center">Action</th>
               </tr>
             </thead>
@@ -378,11 +378,11 @@ export const FormulaBuilder: React.FC<FormulaBuilderProps> = ({
                     </td>
 
                     <td className="p-3 text-right text-slate-300">
-                      ${costPerKg.toFixed(2)}
+                      ₹{costPerKg.toFixed(2)}
                     </td>
 
                     <td className="p-3 text-right text-emerald-400 font-semibold">
-                      ${itemTotalCost.toFixed(2)}
+                      ₹{itemTotalCost.toFixed(2)}
                     </td>
 
                     <td className="p-3 text-center">

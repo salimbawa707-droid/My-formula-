@@ -181,7 +181,7 @@ export const FormulaLibrary: React.FC<FormulaLibraryProps> = ({
 
                   <div>
                     <span className="text-[10px] text-slate-500 block">Cost / kg</span>
-                    <span className="font-bold text-emerald-400">${costing.costPerKgUSD.toFixed(3)}</span>
+                    <span className="font-bold text-emerald-400">₹{costing.costPerKgINR.toFixed(2)}</span>
                   </div>
                 </div>
               </div>

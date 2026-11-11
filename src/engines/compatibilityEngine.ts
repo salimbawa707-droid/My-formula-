@@ -40,13 +40,13 @@ export function checkCompatibility(
   }
 
   const phResult = estimatePH(items, customIngredients);
-  if (phResult.estimatedPH < 3.0) {
+  if (phResult.estimatedPH !== null && phResult.estimatedPH < 3.0) {
     conflicts.push({
       type: 'PH_INSTABILITY',
       severity: 'CRITICAL',
       message: 'CRITICAL pH WARNING: Highly acidic formulation (pH < 3.0). Causes severe equipment corrosion and skin hazards.'
     });
-  } else if (phResult.estimatedPH > 12.5) {
+  } else if (phResult.estimatedPH !== null && phResult.estimatedPH > 12.5) {
     conflicts.push({
       type: 'PH_INSTABILITY',
       severity: 'WARNING',

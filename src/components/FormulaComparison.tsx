@@ -80,7 +80,7 @@ export const FormulaComparison: React.FC<FormulaComparisonProps> = ({
 
             <div>
               <span className="text-[10px] text-slate-500 block uppercase font-sans">Cost / kg</span>
-              <span className="text-base font-bold text-emerald-400">${cost1.costPerKgUSD.toFixed(3)}</span>
+              <span className="text-base font-bold text-emerald-400">₹{cost1.costPerKgINR.toFixed(2)}</span>
             </div>
 
             <div>
@@ -128,7 +128,7 @@ export const FormulaComparison: React.FC<FormulaComparisonProps> = ({
 
             <div>
               <span className="text-[10px] text-slate-500 block uppercase font-sans">Cost / kg</span>
-              <span className="text-base font-bold text-emerald-400">${cost2.costPerKgUSD.toFixed(3)}</span>
+              <span className="text-base font-bold text-emerald-400">₹{cost2.costPerKgINR.toFixed(2)}</span>
             </div>
 
             <div>

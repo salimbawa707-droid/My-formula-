@@ -1,5 +1,6 @@
 /**
  * Detergent Formula Expert — Domain Types
+ * Strictly supports two categories: LIQUID DETERGENTS & DISH WASH
  */
 
 export type MainCategory = 'LIQUID DETERGENTS' | 'DISH WASH';
@@ -52,11 +53,13 @@ export interface MasterIngredient {
   isAcidic?: boolean;
   isBasic?: boolean;
   equivalentWeight?: number; // g/eq
-  chelationCapacityMgCaCO3PerG?: number; // mg CaCO3 / g raw material
+  chelationCapacityMgCaCO3PerG?: number; // mg CaCO3 / g raw material (commercial as-supplied basis)
+  theoreticalActiveCapacityMgPerG?: number; // mg CaCO3 / g 100% active chemical
+  capacityBasis?: 'COMMERCIAL_PRODUCT' | 'ACTIVE_CHEMICAL';
   solubilityGPer100gWater?: number;
   ionicType?: 'anionic' | 'nonionic' | 'cationic' | 'amphoteric' | 'non_ionic_special';
   functionalRole: string;
-  costPerKg: number; // USD / kg
+  costPerKg: number; // INR (₹) / kg
   supplierSpec?: string;
   dataSource: string;
   dataStatus: DataStatus;
@@ -92,44 +95,77 @@ export interface Formula {
 }
 
 export interface ActiveMatterResult {
-  totalActiveMatterPercent: number;
-  totalActiveMassKg: number;
+  surfactantActiveMatterPercent: number;
+  totalSurfactantActiveMatterPercent?: number; // alias
+  totalSurfactantActiveMassKg: number;
+  totalActiveMatterPercent: number; // SSOT alias
+  totalActiveMassKg: number; // SSOT alias
   anionicActivePercent: number;
   nonionicActivePercent: number;
   amphotericActivePercent: number;
   cationicActivePercent: number;
+  nonSurfactantActiveMassKg: number;
+  nonSurfactantSolidsPercent?: number;
+  totalDrySolidsPercent?: number;
+  totalNonVolatileSolidsPercent?: number;
   breakdownByIngredient: {
     ingredientId: string;
     commercialName: string;
+    category: IngredientCategory;
+    isSurfactant: boolean;
     quantityKg: number;
     weightPercent: number;
     activeFraction: number;
     activeContributionPercent: number;
+    activeMassKg: number;
   }[];
 }
 
 export interface NeutralizationResult {
-  labsaQuantityKg: number;
-  labsaActiveMassKg: number;
-  labsaMoles: number;
-  requiredPureNaOHGrams: number;
-  requiredPureKOHGrams: number;
-  causticSodaSolutionKgNeeded: number; // based on caustic %
-  causticSodaInFormulaKg: number;
-  neutralizationStatus: 'EXACT' | 'EXCESS_ACID' | 'EXCESS_BASE' | 'NO_ACID_REQUIRING_NEUTRALIZATION';
-  excessAcidMoles: number;
-  excessBaseMoles: number;
+  acidName: string;
+  acidActiveMassKg: number;
+  acidMoles: number;
+  acidReactiveEquivalents: number;
+  baseReactiveEquivalents: number;
+  limitingReagent: 'ACID' | 'BASE' | 'STOICHIOMETRIC' | 'STOICHIOMETRIC_EQUIVALENCE' | 'NONE' | 'UNKNOWN';
+  neutralizationFraction: number; // 0.0 to 1.0
+  neutralizationStatus: 'FULLY_NEUTRALIZED' | 'UNDER_NEUTRALIZED' | 'BASE_EXCESS' | 'EXCESS_ACID' | 'EXCESS_BASE' | 'NO_REACTION' | 'INSUFFICIENT_DATA';
+  pureNaOHDemandGrams: number;
+  pureKOHDemandGrams: number;
+  commercialCausticDemandKg: number;
+  reactionGeneratedWaterGrams: number;
+  excessAcidEquivalents: number;
+  excessBaseEquivalents: number;
   equation: string;
   notes: string;
+  // Aliases
+  labsaQuantityKg?: number;
+  labsaMoles?: number;
+  causticSodaSolutionKgNeeded?: number;
+  causticSodaInFormulaKg?: number;
+  excessAcidMoles?: number;
+  excessBaseMoles?: number;
+  reactionWaterGeneratedKg?: number;
 }
 
 export interface PHEstimationResult {
-  estimatedPH: number;
-  estimatedPHMin: number;
-  estimatedPHMax: number;
-  solverConvergence: 'CONVERGED' | 'APPROXIMATED' | 'FAILED';
-  bufferCapacityBeta: number;
-  isBufferingSystem: boolean;
+  estimatedPH: number | null;
+  estimatedPHMin?: number;
+  estimatedPHMax?: number;
+  pH?: number | null;
+  status?: 'CONVERGED' | 'INSUFFICIENT_DATA' | 'APPROXIMATED' | 'FAILED' | 'NON_CONVERGED';
+  solverConvergence: 'CONVERGED' | 'APPROXIMATED' | 'FAILED' | 'CHARGE_BALANCE_FAILED' | 'OUT_OF_BOUNDS';
+  solverStatus?: string;
+  solverIterations?: number;
+  iterations?: number;
+  ionicStrength?: number | null;
+  bufferCapacityBeta?: number | null;
+  activityModel?: string;
+  isBufferingSystem?: boolean;
+  excessAcidMoles?: number;
+  excessBaseMoles?: number;
+  detailedSpeciation?: { species: string; concentrationMolPerL: number; charge?: number }[];
+  speciation?: { species: string; concentrationMolPerL: number }[];
   assumptions: string[];
   missingInformation: string[];
   warnings: string[];
@@ -137,17 +173,34 @@ export interface PHEstimationResult {
 
 export interface ChelationResult {
   totalBindingCapacityMgCaCO3: number;
-  ppmCaCO3ChelationCapacity: number; // at batch volume
+  totalActiveBindingCapacityMgCaCO3?: number;
+  pureActiveCapacityMgCaCO3?: number;
+  commercialCapacityMgCaCO3?: number;
+  actualWaterVolumeLiters?: number;
+  waterVolumeLiters?: number;
+  ppmCaCO3ChelationCapacity: number;
   waterHardnessPpmCaCO3: number;
   hardnessLoadMgCaCO3: number;
   chelationCapacityRatio: number;
   safetyMarginPercent: number;
   isAdequateForHardness: boolean;
+  warnings?: string[];
   chelatorBreakdown: {
     ingredientId: string;
     commercialName: string;
     quantityKg: number;
+    activeFraction: number;
+    capacityBasis?: 'COMMERCIAL_PRODUCT' | 'ACTIVE_CHEMICAL';
+    pureActiveCapacityMgPerG?: number;
+    commercialCapacityMgPerG?: number;
+    bindingPerG?: number;
     bindingCapacityMgCaCO3: number;
+    activeBindingCapacityMgCaCO3?: number;
+    mechanism?: string;
+    phOperatingRange?: { min: number; max: number; optimal?: number };
+    isWithinPhWindow?: boolean;
+    scientificStatus?: string;
+    notes?: string;
   }[];
 }
 
@@ -172,19 +225,25 @@ export interface ViscosityResult {
 }
 
 export interface CostingResult {
+  currency: 'INR';
+  directMaterialCostINR: number;
+  costPerKgINR: number;
+  costPerLiterINR: number;
+  totalBatchWeightKg?: number;
+  // Aliases for backwards compatibility where needed
   directMaterialCostUSD: number;
   costPerKgUSD: number;
   costPerLiterUSD: number;
-  suggestedManufacturingCostUSD: number;
-  suggestedRetailPriceUSD: number;
-  grossMarginPercentAtRetail: number;
   ingredientCostBreakdown: {
     ingredientId: string;
     commercialName: string;
     quantityKg: number;
+    costPerKgINR: number;
+    itemTotalINR: number;
+    costPercentOfBatch: number;
+    // USD aliases
     costPerKgUSD: number;
     itemTotalUSD: number;
-    costPercentOfBatch: number;
   }[];
 }
 
@@ -208,7 +267,7 @@ export interface AnalysisStageReport {
   assumptions: string[];
   missingData: string[];
   warnings: string[];
-  status: 'PASSED' | 'WARNING' | 'INSUFFICIENT_DATA';
+  status: 'CALCULATED' | 'WARNING' | 'INSUFFICIENT_DATA' | 'NOT_APPLICABLE';
 }
 
 export interface FormulaAnalysisReport {
@@ -226,10 +285,12 @@ export interface FormulaAnalysisReport {
   };
   stages: AnalysisStageReport[];
   overallSummary: {
-    activeMatterPercent: number;
+    surfactantActiveMatterPercent: number;
+    activeMatterPercent: number; // alias
     estimatedPH: string;
     chelationCapacityPpm: number;
-    costPerKgUSD: number;
+    costPerKgINR: number;
+    costPerKgUSD: number; // alias
     productRoutingSuitability: 'OPTIMAL' | 'ACCEPTABLE' | 'NON_COMPLIANT';
     routingNotes: string[];
   };

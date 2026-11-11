@@ -101,7 +101,7 @@ export const IngredientLibrary: React.FC<IngredientLibraryProps> = ({
                 <th className="p-3">CAS Number</th>
                 <th className="p-3 text-right">Active %</th>
                 <th className="p-3 text-right">Density (g/mL)</th>
-                <th className="p-3 text-right">Cost/kg ($)</th>
+                <th className="p-3 text-right">Cost/kg (₹)</th>
                 <th className="p-3">Status</th>
                 <th className="p-3 text-center">Edit</th>
               </tr>
@@ -168,7 +168,7 @@ export const IngredientLibrary: React.FC<IngredientLibraryProps> = ({
                           className="w-16 bg-slate-950 border border-slate-700 px-1 py-0.5 text-right rounded"
                         />
                       ) : (
-                        `$${ing.costPerKg.toFixed(2)}`
+                        `₹${ing.costPerKg.toFixed(2)}`
                       )}
                     </td>
 

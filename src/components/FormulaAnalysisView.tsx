@@ -91,9 +91,9 @@ export const FormulaAnalysisView: React.FC<FormulaAnalysisViewProps> = ({
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
           <div className="bg-slate-950/60 border border-slate-800/80 p-3 rounded-lg">
-            <span className="text-[10px] text-slate-500 font-semibold uppercase">Active Matter</span>
+            <span className="text-[10px] text-slate-500 font-semibold uppercase">Surfactant Active Matter</span>
             <div className="text-lg font-bold font-mono text-cyan-400">
-              {report.overallSummary.activeMatterPercent}%
+              {report.overallSummary.surfactantActiveMatterPercent ?? report.overallSummary.activeMatterPercent}%
             </div>
           </div>
 
@@ -114,7 +114,7 @@ export const FormulaAnalysisView: React.FC<FormulaAnalysisViewProps> = ({
           <div className="bg-slate-950/60 border border-slate-800/80 p-3 rounded-lg">
             <span className="text-[10px] text-slate-500 font-semibold uppercase">Material Cost</span>
             <div className="text-lg font-bold font-mono text-emerald-400">
-              ${report.overallSummary.costPerKgUSD.toFixed(3)} / kg
+              ₹{(report.overallSummary.costPerKgINR ?? report.overallSummary.costPerKgUSD).toFixed(2)} / kg
             </div>
           </div>
         </div>
@@ -128,9 +128,10 @@ export const FormulaAnalysisView: React.FC<FormulaAnalysisViewProps> = ({
         </h2>
 
         {report.stages.map((stage) => {
-          const isPassed = stage.status === 'PASSED';
+          const isCalculated = stage.status === 'CALCULATED' || (stage.status as string) === 'PASSED';
           const isWarning = stage.status === 'WARNING';
           const isInsufficient = stage.status === 'INSUFFICIENT_DATA';
+          const isNotApplicable = stage.status === 'NOT_APPLICABLE';
 
           return (
             <div
@@ -146,9 +147,9 @@ export const FormulaAnalysisView: React.FC<FormulaAnalysisViewProps> = ({
                 </div>
 
                 <div>
-                  {isPassed && (
+                  {isCalculated && (
                     <span className="flex items-center gap-1 text-xs font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-2.5 py-0.5 rounded-md">
-                      <CheckCircle className="w-3.5 h-3.5" /> PASSED
+                      <CheckCircle className="w-3.5 h-3.5" /> CALCULATED
                     </span>
                   )}
                   {isWarning && (
@@ -159,6 +160,11 @@ export const FormulaAnalysisView: React.FC<FormulaAnalysisViewProps> = ({
                   {isInsufficient && (
                     <span className="flex items-center gap-1 text-xs font-semibold text-slate-400 bg-slate-950 border border-slate-800 px-2.5 py-0.5 rounded-md">
                       <HelpCircle className="w-3.5 h-3.5" /> INSUFFICIENT DATA
+                    </span>
+                  )}
+                  {isNotApplicable && (
+                    <span className="flex items-center gap-1 text-xs font-semibold text-slate-500 bg-slate-950 border border-slate-800 px-2.5 py-0.5 rounded-md">
+                      NOT APPLICABLE
                     </span>
                   )}
                 </div>

@@ -1,15 +1,18 @@
 /**
  * Equilibrium pH Estimation Engine
- * Estimates formulation pH based on acid-base stoichiometry, equilibrium buffers, and alkaline silicate/carbonate builders.
+ * Integrates rigorous chemical equilibrium solver (PHEngineV2)
+ * using charge-balance, Davies activity coefficients, and Newton-Raphson solver.
  */
 
 import { FormulaItem, PHEstimationResult, MasterIngredient } from '../domain/types';
 import { getMasterIngredient } from '../domain/ingredientsMaster';
-import { calculateNeutralization } from './neutralizationEngine';
+import { PHEngineV2 } from './ph/pHEngineV2';
+import { IngredientInput } from './ph/supportTypes';
 
 export function estimatePH(
   items: FormulaItem[],
-  customIngredients?: MasterIngredient[]
+  customIngredients?: MasterIngredient[],
+  options?: { temperatureC?: number; targetPH?: number }
 ): PHEstimationResult {
   const getIngredient = (id: string): MasterIngredient => {
     if (customIngredients) {
@@ -19,121 +22,117 @@ export function estimatePH(
     return getMasterIngredient(id);
   };
 
-  const neutralization = calculateNeutralization(items, customIngredients);
-
-  let hasCitricAcid = false;
-  let hasCitrate = false;
-  let hasCarbonate = false;
-  let hasSilicate = false;
-  let hasTEA = false;
-  let totalWaterKg = 0;
+  const totalMassKg = items.reduce((sum, item) => sum + (Number.isFinite(item.quantityKg) ? item.quantityKg : 0), 0);
   const missingInformation: string[] = [];
-  const assumptions: string[] = [
-    'System temperature assumed at 25°C.',
-    'Ionic activity coefficient approximated near dilute liquid detergent equilibrium.'
-  ];
+  const assumptions: string[] = [];
   const warnings: string[] = [];
 
-  items.forEach(item => {
-    const ing = getIngredient(item.ingredientId);
-    if (ing.id.includes('water')) {
-      totalWaterKg += item.quantityKg;
-    }
-    if (ing.id.includes('citric-acid')) hasCitricAcid = true;
-    if (ing.id.includes('citrate')) hasCitrate = true;
-    if (ing.id.includes('carbonate') || ing.id.includes('soda-ash')) hasCarbonate = true;
-    if (ing.id.includes('metasilicate')) hasSilicate = true;
-    if (ing.id.includes('triethanolamine')) hasTEA = true;
+  if (totalMassKg <= 0) {
+    return {
+      estimatedPH: null,
+      solverConvergence: 'OUT_OF_BOUNDS',
+      assumptions: ['Total formulation mass must be greater than zero.'],
+      missingInformation: ['No formulation ingredients specified.'],
+      warnings: ['Cannot calculate pH for empty formula.']
+    };
+  }
 
+  // Map FormulaItem list to PHEngineV2's IngredientInput format
+  const ingredientInputs: IngredientInput[] = items.map(item => {
+    const ing = getIngredient(item.ingredientId);
+    const weightPct = (item.quantityKg / totalMassKg) * 100;
+    const activePercent = (ing.commercialConcentrationPercent ?? (ing.activeFraction ? ing.activeFraction * 100 : 100));
+    
     if (ing.dataStatus === 'UNKNOWN') {
-      missingInformation.push(`Missing supplier acid-base specification for ${ing.commercialName}.`);
+      missingInformation.push(`Chemical identity / acid-base constant not fully specified for ${ing.commercialName}.`);
     }
+
+    return {
+      name: ing.chemicalName || ing.commercialName,
+      rawPercent: weightPct,
+      weightPct,
+      rawKg: item.quantityKg,
+      weightKg: item.quantityKg,
+      activePercent,
+      activePct: activePercent,
+      id: ing.id,
+      category: ing.category,
+      purity: activePercent,
+      density: ing.density
+    };
   });
 
-  let estimatedPH = 7.0;
-  let isBufferingSystem = false;
-  let bufferCapacityBeta = 0.01;
+  const rawResult = PHEngineV2.calculatePH(ingredientInputs, totalMassKg, {
+    temperatureC: options?.temperatureC ?? 25.0,
+    targetPH: options?.targetPH,
+    activityModel: 'davies'
+  });
 
-  let netAcidMoles = neutralization.excessAcidMoles;
-  let netBaseMoles = neutralization.excessBaseMoles;
+  assumptions.push(...rawResult.assumptions);
+  warnings.push(...rawResult.warnings);
 
-  if (hasCitricAcid) {
-    items.forEach(item => {
+  // Map solver convergence status
+  let solverConvergence: PHEstimationResult['solverConvergence'] = 'CONVERGED';
+  if (rawResult.status === 'NON_CONVERGED') {
+    solverConvergence = 'CHARGE_BALANCE_FAILED';
+  } else if (rawResult.status === 'INSUFFICIENT_DATA') {
+    solverConvergence = 'OUT_OF_BOUNDS';
+  }
+
+  const estimatedPH = rawResult.pH;
+  const bufferCapacityBeta = rawResult.bufferCapacity;
+  const isBufferingSystem = (bufferCapacityBeta ?? 0) > 0.02;
+
+  let estimatedPHMin: number | undefined;
+  let estimatedPHMax: number | undefined;
+
+  if (estimatedPH !== null) {
+    estimatedPHMin = Math.max(0.5, parseFloat((estimatedPH - 0.3).toFixed(2)));
+    estimatedPHMax = Math.min(14.0, parseFloat((estimatedPH + 0.3).toFixed(2)));
+  } else if (rawResult.status === 'INSUFFICIENT_DATA') {
+    // If only neutral surfactants & water are present without any acid/base/buffer,
+    // note the neutral formulation window while flagging absence of pH buffers.
+    const hasOnlyNeutrals = items.every(item => {
       const ing = getIngredient(item.ingredientId);
-      if (ing.id.includes('citric-acid')) {
-        const moles = ((item.quantityKg * 1000) / 210.14) * 2; // ~2 reactive H+ at pH 6-7
-        if (netBaseMoles > 0) {
-          if (netBaseMoles >= moles) {
-            netBaseMoles -= moles;
-          } else {
-            netAcidMoles = moles - netBaseMoles;
-            netBaseMoles = 0;
-          }
-        } else {
-          netAcidMoles += moles;
+      const cat = (ing.category || '').toLowerCase();
+      return cat.includes('surfactant') || cat.includes('solvent') || ing.id.includes('water') || cat.includes('additive');
+    });
+    if (hasOnlyNeutrals) {
+      estimatedPHMin = 6.5;
+      estimatedPHMax = 7.5;
+      assumptions.push('Formulation contains only neutral surfactants and solvent; baseline neutral pH expected (~6.5-7.5) with minimal buffer resistance.');
+    }
+  }
+
+  const detailedSpeciation: { species: string; concentrationMolPerL: number; charge: number }[] = [];
+  if (rawResult.details?.speciation) {
+    for (const group of (rawResult.details.speciation as any[])) {
+      if (Array.isArray(group.species)) {
+        for (const sp of group.species) {
+          detailedSpeciation.push({
+            species: sp.speciesName,
+            concentrationMolPerL: sp.molarConcentration,
+            charge: sp.charge
+          });
         }
       }
-    });
-  }
-
-  if (neutralization.labsaQuantityKg > 0) {
-    if (neutralization.neutralizationStatus === 'EXCESS_ACID') {
-      estimatedPH = 2.0 + Math.max(0, 1.5 - neutralization.excessAcidMoles * 0.1);
-      warnings.push(`Excess un-neutralized LABSA sulfonic acid present (${neutralization.excessAcidMoles.toFixed(2)} excess moles). Formula is acidic (pH ~${estimatedPH.toFixed(1)}).`);
-    } else if (neutralization.neutralizationStatus === 'EXCESS_BASE') {
-      if (hasCitricAcid) {
-        // Citric acid buffers excess caustic base to skin-neutral pH 6.0 - 6.8
-        estimatedPH = 6.5;
-        isBufferingSystem = true;
-      } else if (hasSilicate) {
-        estimatedPH = 11.5 + Math.min(1.0, neutralization.excessBaseMoles * 0.05);
-      } else if (hasCarbonate) {
-        estimatedPH = 10.2 + Math.min(1.0, neutralization.excessBaseMoles * 0.05);
-      } else {
-        estimatedPH = 8.2 + Math.min(1.5, neutralization.excessBaseMoles * 0.1);
-      }
-    } else {
-      // Net neutral or buffered
-      estimatedPH = hasCitrate || hasCitricAcid ? 6.5 : (hasTEA ? 7.8 : 7.0);
-    }
-  } else {
-    // Non-LABSA formula
-    if (hasSilicate) {
-      estimatedPH = 11.2;
-    } else if (hasCarbonate) {
-      estimatedPH = 10.5;
-    } else if (hasCitrate && hasCitricAcid) {
-      estimatedPH = 6.2;
-      isBufferingSystem = true;
-      bufferCapacityBeta = 0.05;
-    } else if (hasCitrate) {
-      estimatedPH = 8.2;
-      isBufferingSystem = true;
-    } else if (hasCitricAcid) {
-      estimatedPH = 3.5;
-    } else {
-      estimatedPH = 7.0;
     }
   }
-
-  if (hasCitrate || hasCarbonate || hasTEA) {
-    isBufferingSystem = true;
-    bufferCapacityBeta = 0.04;
-    assumptions.push('Conjugate acid-base buffer system (Citrate / Carbonate / Amine) detected.');
-  }
-
-  const estimatedPHMin = Math.max(1.0, parseFloat((estimatedPH - 0.4).toFixed(1)));
-  const estimatedPHMax = Math.min(14.0, parseFloat((estimatedPH + 0.4).toFixed(1)));
 
   return {
-    estimatedPH: parseFloat(estimatedPH.toFixed(2)),
+    estimatedPH,
     estimatedPHMin,
     estimatedPHMax,
-    solverConvergence: 'CONVERGED',
+    solverConvergence,
     bufferCapacityBeta,
+    ionicStrength: rawResult.ionicStrength,
+    solverIterations: rawResult.iterations,
     isBufferingSystem,
+    excessAcidMoles: rawResult.excessAcidEquivalents,
+    excessBaseMoles: rawResult.excessBaseEquivalents,
     assumptions,
     missingInformation,
-    warnings
+    warnings,
+    detailedSpeciation
   };
 }
