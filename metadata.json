@@ -1,0 +1,6 @@
+{
+  "name": "Detergent Formula Expert — R&D Formulation Application",
+  "description": "A self-contained, scientifically defensible detergent formulation and calculation application for Liquid Detergents and Dish Wash products.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
