@@ -114,7 +114,7 @@ export const FormulaAnalysisView: React.FC<FormulaAnalysisViewProps> = ({
           <div className="bg-slate-950/60 border border-slate-800/80 p-3 rounded-lg">
             <span className="text-[10px] text-slate-500 font-semibold uppercase">Material Cost</span>
             <div className="text-lg font-bold font-mono text-emerald-400">
-              ₹{(report.overallSummary.costPerKgINR ?? report.overallSummary.costPerKgUSD).toFixed(2)} / kg
+              ₹{(report.overallSummary.costPerKgINR ?? report.overallSummary.costPerKgUSD ?? 0).toFixed(2)} / kg
             </div>
           </div>
         </div>

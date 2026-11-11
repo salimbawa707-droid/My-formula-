@@ -39,13 +39,19 @@ export function exportFormulaAsCSV(formula: Formula, customIngredients?: MasterI
       ? item.activeConcentrationPercentOverride
       : ing.commercialConcentrationPercent;
     const activeKg = qtyKg * (activePct / 100);
-    const costPerKg = item.costPerKgOverride !== undefined ? item.costPerKgOverride : ing.costPerKg;
-    const totalItemCost = qtyKg * costPerKg;
+    const costPerKg = item.costPerKgOverride !== undefined && item.costPerKgOverride !== null
+      ? item.costPerKgOverride
+      : ing.costPerKg;
+    const hasPrice = costPerKg !== null && costPerKg !== undefined && !isNaN(costPerKg);
+    const totalItemCost = hasPrice ? qtyKg * (costPerKg as number) : 0;
 
     totalWeight += qtyKg;
-    totalCost += totalItemCost;
+    if (hasPrice) totalCost += totalItemCost;
 
-    csv += `"${ing.commercialName}","${ing.category}",${qtyKg},${((qtyKg / (formula.batchSizeKg || 100)) * 100).toFixed(2)},${activePct},${activeKg.toFixed(2)},${costPerKg.toFixed(2)},${totalItemCost.toFixed(2)}\n`;
+    const costStr = hasPrice ? (costPerKg as number).toFixed(2) : 'Unpriced';
+    const totalStr = hasPrice ? totalItemCost.toFixed(2) : '—';
+
+    csv += `"${ing.commercialName}","${ing.category}",${qtyKg},${((qtyKg / (formula.batchSizeKg || 100)) * 100).toFixed(2)},${activePct},${activeKg.toFixed(2)},${costStr},${totalStr}\n`;
   });
 
   csv += `\nTOTAL,${totalWeight.toFixed(2)} kg,100%,,,,$${totalCost.toFixed(2)}\n`;

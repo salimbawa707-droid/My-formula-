@@ -86,7 +86,7 @@ export const AUTHORITATIVE_CHELATOR_RECORDS: Record<string, ChelatorSpeciesRecor
     mechanism: 'SEQUESTRATION',
     scientificStatus: 'VERIFIED_COMMERCIAL_GRADE',
     phOperatingRange: { min: 2.0, max: 12.0, optimal: 8.0 },
-    phDependencyNotes: 'Operates as sub-stoichiometric threshold crystallization inhibitor for CaCO3 scale prevention.',
+    phDependencyNotes: 'Operates as sub-stoichiometric threshold crystallization inhibitor for CaCO3 scale prevention (threshold inhibition mode: NOT_MODELED_STOICHIOMETRICALLY; capacity shown reflects stoichiometric sequestration).',
     citation: 'Phosphonate Chelation & Threshold Scale Inhibition Bulletin'
   },
   'edta-na4': {

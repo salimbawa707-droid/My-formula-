@@ -1,18 +1,31 @@
 /**
- * Indian Commercial Costing Engine
- * Calculates raw material cost in Indian Rupees (₹ / INR), cost per kg,
- * volumetric cost per liter (via physical density), and raw material cost contributions.
- * Strictly excludes invented overhead multipliers, simulated retail markups, or arbitrary distributor margins.
+ * Indian Commercial Costing Engine (User-Controlled Pricing)
+ * Strictly calculates costing from user-entered purchase prices.
+ * Returns isCostingComplete = false if any ingredient price is missing.
+ * Allows user-entered optional commercial operational cost fields without hardcoding defaults.
  */
 
 import { FormulaItem, CostingResult, MasterIngredient } from '../domain/types';
 import { getMasterIngredient } from '../domain/ingredientsMaster';
 import { calculateDensity } from './densityEngine';
 
+export interface OptionalCommercialCostInputs {
+  packagingCostINR?: number | null;
+  laborCostINR?: number | null;
+  electricityCostINR?: number | null;
+  overheadCostINR?: number | null;
+  transportationCostINR?: number | null;
+  otherCostINR?: number | null;
+  distributorMarginPercent?: number | null;
+  retailerMarginPercent?: number | null;
+  desiredProfitMarginPercent?: number | null;
+}
+
 export function calculateCosting(
   items: FormulaItem[],
   batchSizeKg: number = 100,
-  customIngredients?: MasterIngredient[]
+  customIngredients?: MasterIngredient[],
+  commercialInputs?: OptionalCommercialCostInputs
 ): CostingResult {
   const getIngredient = (id: string): MasterIngredient => {
     if (customIngredients) {
@@ -22,58 +35,110 @@ export function calculateCosting(
     return getMasterIngredient(id);
   };
 
-  let totalDirectMaterialCostINR = 0;
   let totalBatchWeightKg = 0;
+  let knownSubtotalCostINR = 0;
+  const unpricedIngredientNames: string[] = [];
 
   const ingredientCostBreakdown = items.map(item => {
     const ing = getIngredient(item.ingredientId);
-    const qtyKg = Number.isFinite(item.quantityKg) ? item.quantityKg : 0;
+    const qtyKg = Number.isFinite(item.quantityKg) && item.quantityKg > 0 ? item.quantityKg : 0;
     totalBatchWeightKg += qtyKg;
 
-    // Price in ₹ / kg from override or authoritative master database
-    const pricePerKgINR = item.costPerKgOverride !== undefined && item.costPerKgOverride !== null
-      ? item.costPerKgOverride
-      : (ing.costPerKg ?? 0);
+    // Price resolution: override first, then ing.costPerKg from user prices
+    let pricePerKgINR: number | null = null;
+    if (item.costPerKgOverride !== undefined && item.costPerKgOverride !== null && Number.isFinite(item.costPerKgOverride)) {
+      pricePerKgINR = item.costPerKgOverride;
+    } else if (ing.costPerKg !== undefined && ing.costPerKg !== null && Number.isFinite(ing.costPerKg)) {
+      pricePerKgINR = ing.costPerKg;
+    }
 
-    const itemTotalINR = qtyKg * pricePerKgINR;
-    totalDirectMaterialCostINR += itemTotalINR;
+    const hasPrice = pricePerKgINR !== null && pricePerKgINR >= 0;
+    let itemTotalINR = 0;
+
+    if (hasPrice) {
+      itemTotalINR = qtyKg * (pricePerKgINR as number);
+      knownSubtotalCostINR += itemTotalINR;
+    } else {
+      if (qtyKg > 0 && !ing.id.includes('water')) {
+        unpricedIngredientNames.push(ing.commercialName);
+      }
+    }
 
     return {
       ingredientId: item.ingredientId,
       commercialName: ing.commercialName,
       quantityKg: qtyKg,
-      costPerKgINR: pricePerKgINR,
-      itemTotalINR,
+      costPerKgINR: hasPrice ? pricePerKgINR : null,
+      hasPrice,
+      itemTotalINR: parseFloat(itemTotalINR.toFixed(2)),
       costPercentOfBatch: 0,
-      // Legacy backward-compatible aliases
-      costPerKgUSD: pricePerKgINR,
-      itemTotalUSD: itemTotalINR
+      // USD aliases
+      costPerKgUSD: hasPrice ? pricePerKgINR : null,
+      itemTotalUSD: parseFloat(itemTotalINR.toFixed(2))
     };
   });
 
+  const isCostingComplete = unpricedIngredientNames.length === 0;
   const activeBatchSizeKg = totalBatchWeightKg > 0 ? totalBatchWeightKg : batchSizeKg;
-  const costPerKgINR = activeBatchSizeKg > 0 ? (totalDirectMaterialCostINR / activeBatchSizeKg) : 0;
 
   ingredientCostBreakdown.forEach(item => {
-    item.costPercentOfBatch = totalDirectMaterialCostINR > 0
-      ? Number(((item.itemTotalINR / totalDirectMaterialCostINR) * 100).toFixed(2))
+    item.costPercentOfBatch = knownSubtotalCostINR > 0
+      ? Number(((item.itemTotalINR / knownSubtotalCostINR) * 100).toFixed(2))
       : 0;
   });
+
+  const directMaterialCostINR = knownSubtotalCostINR;
+  const costPerKgINR = activeBatchSizeKg > 0 ? (directMaterialCostINR / activeBatchSizeKg) : 0;
 
   // Volumetric density conversion: Cost per liter = Cost per kg * density (kg/L)
   const densityResult = calculateDensity(items, customIngredients);
   const densityGPerML = densityResult.calculatedDensityGPerML > 0 ? densityResult.calculatedDensityGPerML : 1.03;
   const costPerLiterINR = costPerKgINR * densityGPerML;
 
+  // User-provided optional operational cost fields (no hardcoded percentages)
+  let totalManufacturingCostINR: number | null = null;
+  let suggestedSellingPriceINR: number | null = null;
+
+  const pkgCost = commercialInputs?.packagingCostINR ?? 0;
+  const lbrCost = commercialInputs?.laborCostINR ?? 0;
+  const eleCost = commercialInputs?.electricityCostINR ?? 0;
+  const ovhCost = commercialInputs?.overheadCostINR ?? 0;
+  const trnCost = commercialInputs?.transportationCostINR ?? 0;
+  const othCost = commercialInputs?.otherCostINR ?? 0;
+
+  const hasOptionalCosts = (pkgCost + lbrCost + eleCost + ovhCost + trnCost + othCost) > 0;
+  if (hasOptionalCosts && isCostingComplete) {
+    totalManufacturingCostINR = directMaterialCostINR + pkgCost + lbrCost + eleCost + ovhCost + trnCost + othCost;
+
+    const profitMargin = commercialInputs?.desiredProfitMarginPercent ?? 0;
+    if (profitMargin > 0 && profitMargin < 100) {
+      suggestedSellingPriceINR = totalManufacturingCostINR / (1 - profitMargin / 100);
+    }
+  }
+
   return {
-    directMaterialCostINR: parseFloat(totalDirectMaterialCostINR.toFixed(2)),
+    currency: 'INR',
+    isCostingComplete,
+    unpricedIngredientNames,
+    knownSubtotalCostINR: parseFloat(knownSubtotalCostINR.toFixed(2)),
+    directMaterialCostINR: parseFloat(directMaterialCostINR.toFixed(2)),
     costPerKgINR: parseFloat(costPerKgINR.toFixed(2)),
     costPerLiterINR: parseFloat(costPerLiterINR.toFixed(2)),
     totalBatchWeightKg: parseFloat(activeBatchSizeKg.toFixed(2)),
-    currency: 'INR',
+    packagingCostINR: commercialInputs?.packagingCostINR ?? null,
+    laborCostINR: commercialInputs?.laborCostINR ?? null,
+    electricityCostINR: commercialInputs?.electricityCostINR ?? null,
+    overheadCostINR: commercialInputs?.overheadCostINR ?? null,
+    transportationCostINR: commercialInputs?.transportationCostINR ?? null,
+    otherCostINR: commercialInputs?.otherCostINR ?? null,
+    distributorMarginPercent: commercialInputs?.distributorMarginPercent ?? null,
+    retailerMarginPercent: commercialInputs?.retailerMarginPercent ?? null,
+    desiredProfitMarginPercent: commercialInputs?.desiredProfitMarginPercent ?? null,
+    totalManufacturingCostINR: totalManufacturingCostINR !== null ? parseFloat(totalManufacturingCostINR.toFixed(2)) : null,
+    suggestedSellingPriceINR: suggestedSellingPriceINR !== null ? parseFloat(suggestedSellingPriceINR.toFixed(2)) : null,
     ingredientCostBreakdown,
-    // Backward compatibility aliases for existing UI components
-    directMaterialCostUSD: parseFloat(totalDirectMaterialCostINR.toFixed(2)),
+    // Backward compatibility aliases
+    directMaterialCostUSD: parseFloat(directMaterialCostINR.toFixed(2)),
     costPerKgUSD: parseFloat(costPerKgINR.toFixed(2)),
     costPerLiterUSD: parseFloat(costPerLiterINR.toFixed(2))
   };

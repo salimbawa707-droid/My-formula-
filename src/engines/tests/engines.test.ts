@@ -20,6 +20,7 @@ import { calculateCosting } from '../costingEngine';
 import { calculateDensity } from '../densityEngine';
 import { runFormulaAnalysisPipeline } from '../formulaAnalysisPipeline';
 import { DEFAULT_FORMULAS } from '../../data/defaultFormulas';
+import { getSubcategoryInfo } from '../../domain/taxonomy';
 
 describe('1. Active Surfactant Matter Engine Tests', () => {
   test('surfactant active matter strictly counts surfactants and excludes builders/salts', () => {
@@ -102,20 +103,49 @@ describe('4. Chelation Capacity Engine Tests', () => {
     assert.ok((result.actualWaterVolumeLiters ?? 0) > 0);
     assert.equal(result.chelatorBreakdown[0].isWithinPhWindow, true);
   });
+
+  test('explicitly marks HEDP threshold scale inhibition mode', () => {
+    const items = [
+      { ingredientId: 'hedp-60', quantityKg: 0.5 },
+      { ingredientId: 'deionized-water', quantityKg: 99.5 }
+    ];
+
+    const result = calculateChelation(items, 100, 150, undefined, { currentPH: 8.0 });
+    assert.equal(result.chelatorBreakdown.length, 1);
+    assert.ok(result.chelatorBreakdown[0].notes?.includes('NOT_MODELED_STOICHIOMETRICALLY'));
+  });
 });
 
-describe('5. Indian Commercial Costing Engine Tests', () => {
-  test('calculates direct material cost in Indian Rupees and density volumetric cost per liter', () => {
+describe('5. Indian Commercial Costing Engine Tests (User-Controlled Pricing)', () => {
+  test('flags costing as incomplete when ingredient prices are missing', () => {
     const items = [
-      { ingredientId: 'labsa-90', quantityKg: 10.0 }, // ₹140/kg * 10 = ₹1400
-      { ingredientId: 'sles-28', quantityKg: 20.0 },  // ₹68/kg * 20 = ₹1360
-      { ingredientId: 'deionized-water', quantityKg: 70.0 } // ₹0.50/kg * 70 = ₹35
+      { ingredientId: 'labsa-90', quantityKg: 10.0 },
+      { ingredientId: 'sles-28', quantityKg: 20.0 },
+      { ingredientId: 'deionized-water', quantityKg: 70.0 }
+    ];
+
+    // Built-in prices removed -> costPerKg is null by default
+    const costing = calculateCosting(items, 100);
+
+    assert.equal(costing.currency, 'INR');
+    assert.equal(costing.isCostingComplete, false);
+    assert.ok(costing.unpricedIngredientNames.length >= 2);
+    assert.equal(costing.directMaterialCostINR, 0);
+  });
+
+  test('calculates exact direct material cost when user price overrides are supplied', () => {
+    const items = [
+      { ingredientId: 'labsa-90', quantityKg: 10.0, costPerKgOverride: 140 }, // 10 * 140 = 1400
+      { ingredientId: 'sles-28', quantityKg: 20.0, costPerKgOverride: 68 },   // 20 * 68 = 1360
+      { ingredientId: 'deionized-water', quantityKg: 70.0, costPerKgOverride: 0.50 } // 70 * 0.5 = 35
     ];
 
     const density = calculateDensity(items);
     const costing = calculateCosting(items, 100);
 
     assert.equal(costing.currency, 'INR');
+    assert.equal(costing.isCostingComplete, true);
+    assert.equal(costing.unpricedIngredientNames.length, 0);
     assert.equal(costing.directMaterialCostINR, 2795.0);
     assert.equal(costing.costPerKgINR, 27.95);
     assert.ok(costing.costPerLiterINR > costing.costPerKgINR); // density > 1.0 kg/L
@@ -123,7 +153,18 @@ describe('5. Indian Commercial Costing Engine Tests', () => {
   });
 });
 
-describe('6. 11-Stage Formula Analysis Pipeline Tests', () => {
+describe('6. Taxonomy Classification & Routing Tests', () => {
+  test('correctly maps auto_dishwasher before hand_dishwash in taxonomy classification', () => {
+    const autoInfo = getSubcategoryInfo('auto_dishwasher');
+    const handInfo = getSubcategoryInfo('hand_dishwash');
+
+    assert.equal(autoInfo.parentCategory, 'DISH WASH');
+    assert.equal(handInfo.parentCategory, 'DISH WASH');
+    assert.notEqual(autoInfo.id, handInfo.id);
+  });
+});
+
+describe('7. 11-Stage Formula Analysis Pipeline Tests', () => {
   test('executes all 11 stages deterministically on default formulas', () => {
     for (const formula of DEFAULT_FORMULAS) {
       const report = runFormulaAnalysisPipeline(formula);

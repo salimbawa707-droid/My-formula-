@@ -24,7 +24,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     equivalentWeight: 322.0,
     ionicType: 'anionic',
     functionalRole: 'Primary heavy-duty cleansing anionic surfactant & grease cutter',
-    costPerKg: 140.0, // ₹ 140/kg in India
+    costPerKg: null,
     supplierSpec: 'Standard Commercial Grade 90% Active LABSA, Acid Value ~ 180-190 mg KOH/g',
     dataSource: 'Indian Petrochemicals / Technical Data Sheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -42,7 +42,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     typicalPH: 7.0,
     ionicType: 'anionic',
     functionalRole: 'High-foaming primary anionic surfactant for suds and viscosity building',
-    costPerKg: 68.0, // ₹ 68/kg
+    costPerKg: null,
     supplierSpec: '28% Aqueous Solution Commercial Grade, 1,4-Dioxane < 30 ppm',
     dataSource: 'Godrej Industries / Galaxy Surfactants TDS',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -60,7 +60,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     typicalPH: 7.2,
     ionicType: 'anionic',
     functionalRole: 'Concentrated anionic surfactant paste for high-active liquids',
-    costPerKg: 155.0, // ₹ 155/kg
+    costPerKg: null,
     supplierSpec: '70% Active Surfactant Paste',
     dataSource: 'Galaxy Surfactants / BASF Technical Datasheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -78,7 +78,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     typicalPH: 7.5,
     ionicType: 'anionic',
     functionalRole: 'Hard-water tolerant, high-flash foaming anionic surfactant',
-    costPerKg: 95.0, // ₹ 95/kg
+    costPerKg: null,
     supplierSpec: '38% Active Aqueous Liquid, Free Oil < 1.5%',
     dataSource: 'Godrej Industries AOS-38 TDS',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -96,7 +96,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     typicalPH: 7.5,
     ionicType: 'anionic',
     functionalRole: 'High wetting and foaming primary anionic surfactant',
-    costPerKg: 82.0, // ₹ 82/kg
+    costPerKg: null,
     supplierSpec: '30% Aqueous Solution',
     dataSource: 'Industry Standard Spec Sheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -114,7 +114,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     typicalPH: 7.0,
     ionicType: 'anionic',
     functionalRole: 'Extremely high electrolyte & acid/alkali stable anionic surfactant',
-    costPerKg: 210.0, // ₹ 210/kg
+    costPerKg: null,
     supplierSpec: 'Clariant Hostapur SAS 60 TDS',
     dataSource: 'Clariant Specification Sheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -135,7 +135,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     hlb: 12.1,
     ionicType: 'nonionic',
     functionalRole: 'Oily stain emulsifier and grease remover for liquid detergents',
-    costPerKg: 175.0, // ₹ 175/kg
+    costPerKg: null,
     supplierSpec: '100% Active Anhydrous Nonionic, Cloud Point ~ 50-54°C in 1% water',
     dataSource: 'Sasol / Shell Chemical Specification',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -154,7 +154,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     hlb: 12.5,
     ionicType: 'nonionic',
     functionalRole: 'Fast wetting & oil emulsification nonionic surfactant',
-    costPerKg: 185.0, // ₹ 185/kg
+    costPerKg: null,
     supplierSpec: 'Shell Chemicals Neodol 91-6 TDS',
     dataSource: 'Shell Chemicals TDS',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -173,7 +173,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     hlb: 13.0,
     ionicType: 'nonionic',
     functionalRole: '100% bio-based nonionic alkyl polyglucoside for mild dishwash and laundry',
-    costPerKg: 230.0, // ₹ 230/kg
+    costPerKg: null,
     supplierSpec: 'BASF Plantacare 1200 TDS, 50-53% Solids',
     dataSource: 'BASF Technical Specification',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -192,7 +192,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     hlb: 13.2,
     ionicType: 'nonionic',
     functionalRole: 'Plant-derived mild nonionic surfactant with high foaming profile',
-    costPerKg: 220.0, // ₹ 220/kg
+    costPerKg: null,
     supplierSpec: '50% Active Aqueous Liquid',
     dataSource: 'BASF Technical Specification',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -211,7 +211,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     hlb: 7.0,
     ionicType: 'non_ionic_special',
     functionalRole: 'Strict low-foaming nonionic surfactant for automatic dishwash machines',
-    costPerKg: 290.0, // ₹ 290/kg
+    costPerKg: null,
     supplierSpec: 'BASF Pluronic PE 6200 TDS, 100% Active Liquid',
     dataSource: 'BASF Specification Sheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -230,7 +230,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     hlb: 13.5,
     ionicType: 'nonionic',
     functionalRole: 'Foam booster, suds stabilizer, and viscosity builder',
-    costPerKg: 165.0, // ₹ 165/kg
+    costPerKg: null,
     supplierSpec: '85% Active Viscous Liquid, Free Amine < 5%',
     dataSource: 'Godrej / Galaxy Surfactants TDS',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -250,7 +250,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     typicalPH: 6.0,
     ionicType: 'amphoteric',
     functionalRole: 'Foam booster, skin mildness additive, and viscosity building co-surfactant',
-    costPerKg: 85.0, // ₹ 85/kg
+    costPerKg: null,
     supplierSpec: '30% Aqueous Betaine Solution, NaCl ~ 4.5-5.5%',
     dataSource: 'Evonik / Galaxy Surfactants Specification Sheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -268,7 +268,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     typicalPH: 7.0,
     ionicType: 'amphoteric',
     functionalRole: 'High grease emulsifier, flash foam booster, and bleach stable amine oxide',
-    costPerKg: 135.0, // ₹ 135/kg
+    costPerKg: null,
     supplierSpec: 'Nouryon Aromox TDS',
     dataSource: 'Nouryon Technical Datasheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -289,7 +289,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     isBasic: true,
     equivalentWeight: 40.0,
     functionalRole: 'Primary alkaline neutralizing base for LABSA and saponification',
-    costPerKg: 38.0, // ₹ 38/kg
+    costPerKg: null,
     supplierSpec: '50% Rayon Grade Caustic Soda Solution (GACL / DCM Shriram)',
     dataSource: 'Gujarat Alkalies & Chemicals Ltd (GACL) TDS',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -308,7 +308,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     isBasic: true,
     equivalentWeight: 40.0,
     functionalRole: 'Solid alkaline neutralizing agent',
-    costPerKg: 62.0, // ₹ 62/kg
+    costPerKg: null,
     supplierSpec: '98% Minimum Purity Technical Flakes (GACL)',
     dataSource: 'GACL Technical Specification',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -327,7 +327,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     isBasic: true,
     equivalentWeight: 56.11,
     functionalRole: 'High solubility potassium base for liquid laundry concentrates',
-    costPerKg: 78.0, // ₹ 78/kg
+    costPerKg: null,
     supplierSpec: '45% Potassium Hydroxide Liquid',
     dataSource: 'Standard Chemical Specification',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -347,7 +347,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     isBasic: true,
     equivalentWeight: 149.19,
     functionalRole: 'Mild organic amine neutralizing agent for soft, clear liquid detergents',
-    costPerKg: 190.0, // ₹ 190/kg
+    costPerKg: null,
     supplierSpec: '99% Pure Technical Grade TEA',
     dataSource: 'Dow Chemical Technical Datasheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -367,7 +367,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     isBasic: true,
     equivalentWeight: 61.08,
     functionalRole: 'Compact low molecular weight amine for concentrated liquid laundry',
-    costPerKg: 175.0, // ₹ 175/kg
+    costPerKg: null,
     supplierSpec: 'Huntsman / Dow Technical Specification',
     dataSource: 'Huntsman Corporation TDS',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -389,7 +389,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     theoreticalActiveCapacityMgPerG: 319.15, // Pure active basis (1000 * 100.09 / 351.1 * 1.12)
     capacityBasis: 'COMMERCIAL_PRODUCT',
     functionalRole: 'Readily biodegradable eco-friendly chelator for hard water binding',
-    costPerKg: 195.0, // ₹ 195/kg
+    costPerKg: null,
     supplierSpec: 'Nouryon Dissolvine GL-47-S TDS (47% Active Aqueous)',
     dataSource: 'Nouryon Technical Datasheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -409,7 +409,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     theoreticalActiveCapacityMgPerG: 340.33, // Pure anhydrous basis
     capacityBasis: 'COMMERCIAL_PRODUCT',
     functionalRole: 'Environmentally safe primary builder and pH buffer',
-    costPerKg: 85.0, // ₹ 85/kg
+    costPerKg: null,
     supplierSpec: 'USP / Food Grade Powder',
     dataSource: 'Jungbunzlauer Specification',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -432,7 +432,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     theoreticalActiveCapacityMgPerG: 476.3,
     capacityBasis: 'COMMERCIAL_PRODUCT',
     functionalRole: 'pH adjusting organic acid and weak calcium sequestrant',
-    costPerKg: 92.0, // ₹ 92/kg
+    costPerKg: null,
     supplierSpec: '100% Granular Citric Acid',
     dataSource: 'Jungbunzlauer Datasheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -454,7 +454,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     theoreticalActiveCapacityMgPerG: 485.79, // Pure active threshold inhibition basis
     capacityBasis: 'COMMERCIAL_PRODUCT',
     functionalRole: 'High-performance phosphonate threshold scale inhibitor & chelator',
-    costPerKg: 235.0, // ₹ 235/kg
+    costPerKg: null,
     supplierSpec: 'Italmatch Dequest 2010 TDS (60% Aqueous Acid)',
     dataSource: 'Italmatch Chemicals TDS',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -474,7 +474,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     theoreticalActiveCapacityMgPerG: 263.27, // Pure active stoichiometric basis
     capacityBasis: 'COMMERCIAL_PRODUCT',
     functionalRole: 'Heavy metal and calcium sequestration agent',
-    costPerKg: 170.0, // ₹ 170/kg
+    costPerKg: null,
     supplierSpec: '99% Anhydrous Powder',
     dataSource: 'Dow / BASF Datasheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -494,7 +494,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     theoreticalActiveCapacityMgPerG: 458.82,
     capacityBasis: 'COMMERCIAL_PRODUCT',
     functionalRole: 'High alkalinity calcium and iron chelator for machine dishwash (pH > 10.5)',
-    costPerKg: 72.0, // ₹ 72/kg
+    costPerKg: null,
     supplierSpec: 'Technical Crystalline Powder',
     dataSource: 'Jungbunzlauer Datasheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -514,7 +514,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     typicalPH: 12.5,
     isBasic: true,
     functionalRole: 'Alkaline builder, saponification agent, and metal corrosion inhibitor for auto dishwash',
-    costPerKg: 55.0, // ₹ 55/kg
+    costPerKg: null,
     supplierSpec: 'Granular Metasilicate (SiO2:Na2O ~ 1:1)',
     dataSource: 'PQ Corporation Technical Datasheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -533,7 +533,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     pKaValues: [6.35, 10.33],
     isBasic: true,
     functionalRole: 'Alkalinity reserve source for fat saponification and hard water precipitation',
-    costPerKg: 28.0, // ₹ 28/kg (Tata Chemicals / GHCL)
+    costPerKg: null,
     supplierSpec: '99.2% Sodium Carbonate Light (Tata Chemicals)',
     dataSource: 'Tata Chemicals Specification Sheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -552,7 +552,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     pKaValues: [6.35, 10.33],
     isBasic: true,
     functionalRole: 'Mild pH buffer for delicate wash liquids',
-    costPerKg: 36.0, // ₹ 36/kg
+    costPerKg: null,
     supplierSpec: 'Technical / USP Grade Powder',
     dataSource: 'Tata Chemicals Datasheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -571,7 +571,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     density: 1.18,
     typicalPH: 8.0,
     functionalRole: 'Solubilizing hydrotrope to lower cloud point and prevent formulation phase separation',
-    costPerKg: 90.0, // ₹ 90/kg
+    costPerKg: null,
     supplierSpec: '40% Active Liquid',
     dataSource: 'Stepan STEPANATE SXS TDS',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -588,7 +588,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     density: 1.036,
     typicalPH: 7.0,
     functionalRole: 'Solvent, freeze-thaw stabilizer, and enzyme liquid stabilizer',
-    costPerKg: 155.0, // ₹ 155/kg
+    costPerKg: null,
     supplierSpec: 'USP / Industrial Grade (Manali Petrochemicals)',
     dataSource: 'Dow Chemical / Manali Petro Technical Datasheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -605,7 +605,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     density: 0.81,
     typicalPH: 7.0,
     functionalRole: 'Viscosity reducer and clarity aid in heavy duty concentrated liquids',
-    costPerKg: 95.0, // ₹ 95/kg
+    costPerKg: null,
     supplierSpec: '96% Denatured Alcohol',
     dataSource: 'Industrial Distillery Specification',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -624,7 +624,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     density: 2.16,
     typicalPH: 7.0,
     functionalRole: 'Electrolyte viscosity builder for SLES / Betaine micellar thickening',
-    costPerKg: 8.0, // ₹ 8/kg
+    costPerKg: null,
     supplierSpec: '99.5% Pure Refined Salt',
     dataSource: 'Tata Salt / Commercial Grade Spec',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -640,7 +640,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     density: 1.59,
     typicalPH: 7.0,
     functionalRole: 'Polymer thickener and anti-redeposition agent for laundry liquids',
-    costPerKg: 250.0, // ₹ 250/kg
+    costPerKg: null,
     supplierSpec: 'High Viscosity Grade Powder (1% aq: ~2000-3000 cP)',
     dataSource: 'Ashland Aqualon Datasheet',
     dataStatus: 'ESTIMATED_WITH_ASSUMPTIONS'
@@ -656,7 +656,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     density: 1.50,
     typicalPH: 7.0,
     functionalRole: 'Pseudoplastic rheology modifier for acidic or highly alkaline liquids',
-    costPerKg: 450.0, // ₹ 450/kg
+    costPerKg: null,
     supplierSpec: 'CP Kelco Keltrol TDS (80 Mesh Powder)',
     dataSource: 'CP Kelco Technical Specification',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -674,7 +674,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     density: 1.15,
     typicalPH: 8.0,
     functionalRole: 'Protein stain removal (blood, egg, grass, milk) in liquid laundry',
-    costPerKg: 680.0, // ₹ 680/kg
+    costPerKg: null,
     supplierSpec: 'Novonesis / Novozymes Savinase TDS',
     dataSource: 'Novozymes Product Sheet',
     dataStatus: 'ESTIMATED_WITH_ASSUMPTIONS'
@@ -690,7 +690,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     density: 1.15,
     typicalPH: 8.0,
     functionalRole: 'Starch soil degradation (pasta, sauce, gravy) for laundry and dishwash',
-    costPerKg: 720.0, // ₹ 720/kg
+    costPerKg: null,
     supplierSpec: 'Novonesis / Novozymes Stainzyme TDS',
     dataSource: 'Novozymes Product Sheet',
     dataStatus: 'ESTIMATED_WITH_ASSUMPTIONS'
@@ -708,7 +708,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     density: 1.02,
     typicalPH: 4.0,
     functionalRole: 'Broad-spectrum liquid preservative against bacteria, yeast, and fungi',
-    costPerKg: 310.0, // ₹ 310/kg
+    costPerKg: null,
     supplierSpec: '1.5% Active Aqueous Preservative',
     dataSource: 'DuPont / Dow Kathon Specification',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -725,7 +725,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     density: 1.44,
     typicalPH: 8.0,
     functionalRole: 'Eco-certified preservative for acidic formulations (pH < 6.5)',
-    costPerKg: 130.0, // ₹ 130/kg
+    costPerKg: null,
     supplierSpec: 'FCC Grade Granular',
     dataSource: 'Manufacturer Specification',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -742,7 +742,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     density: 1.40,
     typicalPH: 8.5,
     functionalRole: 'Optical brightening whitening agent for cotton and cellulose laundry',
-    costPerKg: 1450.0, // ₹ 1450/kg
+    costPerKg: null,
     supplierSpec: 'BASF Tinopal CBS-X TDS',
     dataSource: 'BASF Specification Sheet',
     dataStatus: 'VERIFIED_SPECIFICATION'
@@ -757,7 +757,7 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     density: 0.92,
     typicalPH: 7.0,
     functionalRole: 'Aesthetic fragrance scent addition for dishwash and laundry',
-    costPerKg: 1100.0, // ₹ 1100/kg
+    costPerKg: null,
     supplierSpec: 'Concentrated Industrial Fragrance Compound',
     dataSource: 'Fragrance House Specification',
     dataStatus: 'ESTIMATED_WITH_ASSUMPTIONS'
@@ -774,12 +774,14 @@ export const MASTER_INGREDIENTS: MasterIngredient[] = [
     density: 1.00,
     typicalPH: 7.0,
     functionalRole: 'Continuous phase carrier solvent for liquid formulation',
-    costPerKg: 0.50, // ₹ 0.50/kg DM Water
+    costPerKg: null,
     supplierSpec: 'Purified Water Conductivity < 5 µS/cm',
     dataSource: 'Standard Reference Water',
     dataStatus: 'VERIFIED_SPECIFICATION'
   }
 ];
+
+import { getUserPrice } from './userPrices';
 
 export function isSurfactantCategory(category: string): boolean {
   return (
@@ -792,20 +794,33 @@ export function isSurfactantCategory(category: string): boolean {
 
 export function getMasterIngredient(id: string): MasterIngredient {
   const found = MASTER_INGREDIENTS.find(i => i.id === id);
-  if (found) return found;
-  return {
+  const base = found ? { ...found } : {
     id,
     chemicalName: `Unknown Raw Material (${id})`,
     commercialName: `Commercial Ingredient ${id}`,
-    category: 'Other Additive',
+    category: 'Other Additive' as const,
     activeFraction: 1.0,
     commercialConcentrationPercent: 100,
     density: 1.0,
     typicalPH: 7.0,
     functionalRole: 'Unclassified Additive',
-    costPerKg: 100.0,
+    costPerKg: null,
     dataSource: 'User Custom Input',
-    dataStatus: 'UNKNOWN',
+    dataStatus: 'UNKNOWN' as const,
     missingInformationNotes: 'Missing supplier specifications and chemical CAS number.'
   };
+
+  const userRec = getUserPrice(id);
+  if (userRec && userRec.costPerKgINR !== undefined && userRec.costPerKgINR !== null) {
+    return {
+      ...base,
+      costPerKg: userRec.costPerKgINR,
+      supplierName: userRec.supplierName,
+      gradePurchased: userRec.gradePurchased,
+      purchaseDate: userRec.purchaseDate,
+      notes: userRec.notes
+    };
+  }
+
+  return base;
 }

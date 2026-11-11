@@ -268,9 +268,15 @@ export const FormulaBuilder: React.FC<FormulaBuilderProps> = ({
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
           <span className="text-[11px] font-semibold text-slate-400">Material Cost</span>
           <div className="text-xl font-bold font-mono text-emerald-400">
-            ₹{costing.costPerKgINR.toFixed(2)} <span className="text-xs text-slate-500">/ kg</span>
+            {costing.isCostingComplete ? (
+              <>₹{costing.costPerKgINR.toFixed(2)} <span className="text-xs text-slate-500">/ kg</span></>
+            ) : (
+              <span className="text-amber-400 text-sm">₹{costing.costPerKgINR.toFixed(2)} (Partial)</span>
+            )}
           </div>
-          <p className="text-[10px] text-slate-500">Batch total: ₹{costing.directMaterialCostINR.toFixed(2)}</p>
+          <p className="text-[10px] text-slate-500">
+            {costing.isCostingComplete ? `Batch total: ₹${costing.directMaterialCostINR.toFixed(2)}` : `Subtotal: ₹${costing.knownSubtotalCostINR.toFixed(2)} (Incomplete)`}
+          </p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
@@ -281,6 +287,22 @@ export const FormulaBuilder: React.FC<FormulaBuilderProps> = ({
           <p className="text-[10px] text-slate-500">Density estimated</p>
         </div>
       </div>
+
+      {!costing.isCostingComplete && (
+        <div className="bg-amber-950/80 border border-amber-800 p-4 rounded-xl text-xs text-amber-200 flex items-start gap-3 shadow-lg">
+          <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <div className="font-bold text-amber-300 text-sm">INCOMPLETE FORMULA COSTING</div>
+            <p>
+              The following ingredient(s) have no purchase price entered:{' '}
+              <span className="font-mono text-white font-semibold">{costing.unpricedIngredientNames.join(', ')}</span>.
+            </p>
+            <p className="text-[11px] text-amber-400/90">
+              Material cost subtotal reflects known priced ingredients only (₹{costing.knownSubtotalCostINR.toFixed(2)}). Go to the Ingredient Library tab to enter ingredient purchase prices.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Ingredient Formulation Table */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
@@ -338,8 +360,11 @@ export const FormulaBuilder: React.FC<FormulaBuilderProps> = ({
                   ? item.activeConcentrationPercentOverride
                   : ing.commercialConcentrationPercent;
                 const activeContribPct = (qtyKg * (activePct / 100) / batchSizeKg) * 100;
-                const costPerKg = item.costPerKgOverride !== undefined ? item.costPerKgOverride : ing.costPerKg;
-                const itemTotalCost = qtyKg * costPerKg;
+                const costPerKg = item.costPerKgOverride !== undefined && item.costPerKgOverride !== null
+                  ? item.costPerKgOverride
+                  : ing.costPerKg;
+                const hasPrice = costPerKg !== null && costPerKg !== undefined && !isNaN(costPerKg);
+                const itemTotalCost = hasPrice ? qtyKg * (costPerKg as number) : null;
 
                 return (
                   <tr key={`${item.ingredientId}-${index}`} className="hover:bg-slate-800/40 transition-colors">
@@ -377,12 +402,20 @@ export const FormulaBuilder: React.FC<FormulaBuilderProps> = ({
                       {activeContribPct.toFixed(2)}%
                     </td>
 
-                    <td className="p-3 text-right text-slate-300">
-                      ₹{costPerKg.toFixed(2)}
+                    <td className="p-3 text-right">
+                      {hasPrice ? (
+                        <span className="text-slate-200">₹{(costPerKg as number).toFixed(2)}</span>
+                      ) : (
+                        <span className="text-amber-400 italic text-[10px]">Unpriced</span>
+                      )}
                     </td>
 
-                    <td className="p-3 text-right text-emerald-400 font-semibold">
-                      ₹{itemTotalCost.toFixed(2)}
+                    <td className="p-3 text-right font-semibold">
+                      {itemTotalCost !== null ? (
+                        <span className="text-emerald-400">₹{itemTotalCost.toFixed(2)}</span>
+                      ) : (
+                        <span className="text-slate-500">—</span>
+                      )}
                     </td>
 
                     <td className="p-3 text-center">

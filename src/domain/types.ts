@@ -59,7 +59,11 @@ export interface MasterIngredient {
   solubilityGPer100gWater?: number;
   ionicType?: 'anionic' | 'nonionic' | 'cationic' | 'amphoteric' | 'non_ionic_special';
   functionalRole: string;
-  costPerKg: number; // INR (₹) / kg
+  costPerKg: number | null; // INR (₹) / kg (user-controlled, default null)
+  supplierName?: string;
+  gradePurchased?: string;
+  purchaseDate?: string;
+  notes?: string;
   supplierSpec?: string;
   dataSource: string;
   dataStatus: DataStatus;
@@ -226,10 +230,24 @@ export interface ViscosityResult {
 
 export interface CostingResult {
   currency: 'INR';
+  isCostingComplete: boolean;
+  unpricedIngredientNames: string[];
+  knownSubtotalCostINR: number;
   directMaterialCostINR: number;
   costPerKgINR: number;
   costPerLiterINR: number;
   totalBatchWeightKg?: number;
+  packagingCostINR?: number | null;
+  laborCostINR?: number | null;
+  electricityCostINR?: number | null;
+  overheadCostINR?: number | null;
+  transportationCostINR?: number | null;
+  otherCostINR?: number | null;
+  distributorMarginPercent?: number | null;
+  retailerMarginPercent?: number | null;
+  desiredProfitMarginPercent?: number | null;
+  totalManufacturingCostINR?: number | null;
+  suggestedSellingPriceINR?: number | null;
   // Aliases for backwards compatibility where needed
   directMaterialCostUSD: number;
   costPerKgUSD: number;
@@ -238,11 +256,12 @@ export interface CostingResult {
     ingredientId: string;
     commercialName: string;
     quantityKg: number;
-    costPerKgINR: number;
+    costPerKgINR: number | null;
+    hasPrice?: boolean;
     itemTotalINR: number;
     costPercentOfBatch: number;
     // USD aliases
-    costPerKgUSD: number;
+    costPerKgUSD: number | null;
     itemTotalUSD: number;
   }[];
 }
